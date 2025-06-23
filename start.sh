@@ -18,6 +18,10 @@ while ! php artisan tinker --execute="DB::connection()->getPdo()" >/dev/null 2>&
 done
 echo "Database connection successful!"
 
+# Add a small buffer just in case the database needs a moment to stabilize
+echo "Giving the database a moment to stabilize..."
+sleep 5
+
 # --- 2. Run Migrations & Seeders ---
 echo "Running database migrations and seeding..."
 php artisan migrate --force --seed
