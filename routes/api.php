@@ -75,6 +75,7 @@ Route::get('/', function () {
 
 Route::middleware('auth:sanctum')->group(function () {
     Route::get('/hero/{id?}', [HeroProfileController::class, 'show']);
+    Route::post('/hero', [HeroProfileController::class, 'store']);
     Route::put('/hero/{id?}', [HeroProfileController::class, 'update']);
     Route::apiResource('projects', ProjectController::class);
     
