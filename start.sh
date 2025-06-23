@@ -34,13 +34,13 @@ done
 echo "Database connection successful!"
 # -- End of Connection Check --
 
-# Запуск миграций
-echo "Running migrations..."
-php artisan migrate --force
+# Запуск миграций с повторными попытками
+echo "Running migrations with retries..."
+php artisan migrate --force || (sleep 5 && php artisan migrate --force) || (sleep 10 && php artisan migrate --force)
 
-# Запуск сидов
-echo "Running seeders..."
-php artisan db:seed --force
+# Запуск сидов с повторными попытками
+echo "Running seeders with retries..."
+php artisan db:seed --force || (sleep 5 && php artisan db:seed --force) || (sleep 10 && php artisan db:seed --force)
 
 # Очистка кэша после миграций
 php artisan config:cache
