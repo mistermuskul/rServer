@@ -14,6 +14,9 @@ php artisan cache:clear
 # Генерация ключа приложения
 php artisan key:generate --force
 
+# Создание символической ссылки для storage
+php artisan storage:link
+
 # Запуск миграций и сидеров
 php artisan migrate --force --seed
 
