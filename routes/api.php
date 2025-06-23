@@ -10,6 +10,15 @@ use App\Http\Controllers\ProjectController;
 use App\Http\Controllers\MessageController;
 use App\Http\Controllers\TelegramController;
 
+// Тестовый маршрут для проверки API
+Route::get('/test', function () {
+    return response()->json([
+        'message' => 'API работает!',
+        'timestamp' => now(),
+        'status' => 'success'
+    ]);
+});
+
 Route::prefix('auth')->group(function () {
     Route::post('/login', [AuthController::class, 'login']);
     Route::post('/auto-login/{uuid}', [AuthController::class, 'autoLogin']);
@@ -19,7 +28,14 @@ Route::prefix('auth')->group(function () {
 });
 
 Route::get('/', function () {
-    return view('welcome');
+    return response()->json([
+        'message' => 'Laravel API работает!',
+        'endpoints' => [
+            'test' => '/api/test',
+            'auth' => '/api/auth/login',
+            'hero' => '/api/hero'
+        ]
+    ]);
 });
 
 Route::middleware('auth:sanctum')->group(function () {

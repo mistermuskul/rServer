@@ -22,11 +22,13 @@ return [
     'allowed_origins' => [
         'http://localhost:9000',
         'http://localhost:8080',
+        'http://localhost:3000',
         'https://*.github.io',
         'https://*.githubpages.com',
         'https://*.vercel.app',
         'https://*.netlify.app',
-        'https://*.railway.app'
+        'https://*.railway.app',
+        'https://mistermuskul.github.io'
     ],
 
     'allowed_origins_patterns' => [],
@@ -37,6 +39,6 @@ return [
 
     'max_age' => 0,
 
-    'supports_credentials' => false,
+    'supports_credentials' => true,
 
 ]; 
