@@ -8,5 +8,16 @@ Route::get('/api/{any}', function () {
 })->where('any', '.*');
 
 Route::get('/', function () {
-    return view('welcome');
+    return response()->json([
+        'message' => 'Laravel работает!',
+        'timestamp' => now(),
+        'status' => 'success'
+    ]);
+});
+
+Route::get('/health', function () {
+    return response()->json([
+        'status' => 'healthy',
+        'timestamp' => now()
+    ]);
 });
