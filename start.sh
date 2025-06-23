@@ -21,12 +21,24 @@ fi
 php artisan config:clear
 php artisan route:clear
 
+# Debug: Show database connection info
+echo "Database connection debug info:"
+echo "DB_CONNECTION: $DB_CONNECTION"
+echo "DB_HOST: $DB_HOST"
+echo "DB_PORT: $DB_PORT"
+echo "DB_DATABASE: $DB_DATABASE"
+echo "DB_USERNAME: $DB_USERNAME"
+echo "MYSQLHOST: $MYSQLHOST"
+echo "MYSQLPORT: $MYSQLPORT"
+echo "MYSQLDATABASE: $MYSQLDATABASE"
+echo "MYSQLUSER: $MYSQLUSER"
+
 # Wait for the database to be ready
 # Use a loop to attempt connection until it succeeds
 echo "Waiting for database connection..."
 MAX_ATTEMPTS=30
 ATTEMPTS=0
-while ! php artisan db:monitor --database=mysql --max-attempts=1 > /dev/null 2>&1; do
+while ! php artisan tinker --execute="DB::connection()->getPdo()" > /dev/null 2>&1; do
     ATTEMPTS=$((ATTEMPTS+1))
     if [ $ATTEMPTS -ge $MAX_ATTEMPTS ]; then
         echo "Database connection failed after $MAX_ATTEMPTS attempts."
