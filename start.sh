@@ -1,55 +1,83 @@
 #!/bin/bash
 
-# Установка зависимостей если их нет
-if [ ! -d "vendor" ]; then
-    echo "Installing Composer dependencies..."
-    composer install --no-dev --optimize-autoloader
+# Exit on any error
+set -e
+
+# Check if Composer dependencies are installed
+if [ ! -f "vendor/autoload.php" ]; then
+    composer install --no-progress --no-interaction
 fi
 
-# Генерация ключа приложения если его нет
+# Generate Laravel application key if it doesn't exist
+if [ ! -f ".env" ]; then
+    cp .env.example .env
+fi
+
 if [ -z "$APP_KEY" ]; then
-    echo "Generating application key..."
     php artisan key:generate
 fi
 
-# Очистка кэша
+# Clear cache to ensure fresh environment variables are used
 php artisan config:clear
-php artisan cache:clear
-php artisan view:clear
+php artisan route:clear
 
-# -- Robust Database Connection Check with Retry --
-echo "Waiting for database to be ready..."
-max_attempts=15
-attempt_num=1
-# Hide output of tinker, we just need the exit code
-while ! php artisan tinker --execute="DB::connection()->getPdo()" >/dev/null 2>&1; do
-    if [ ${attempt_num} -eq ${max_attempts} ]; then
-        echo "Database connection failed after ${max_attempts} attempts. Exiting."
+# Wait for the database to be ready
+# Use a loop to attempt connection until it succeeds
+echo "Waiting for database connection..."
+MAX_ATTEMPTS=30
+ATTEMPTS=0
+while ! php artisan db:monitor --database=mysql --max-attempts=1 > /dev/null 2>&1; do
+    ATTEMPTS=$((ATTEMPTS+1))
+    if [ $ATTEMPTS -ge $MAX_ATTEMPTS ]; then
+        echo "Database connection failed after $MAX_ATTEMPTS attempts."
         exit 1
     fi
-    echo "Attempt ${attempt_num} of ${max_attempts}: Database not ready. Waiting 2 seconds..."
-    attempt_num=$((attempt_num+1))
+    echo "Waiting for database... (attempt $ATTEMPTS of $MAX_ATTEMPTS)"
     sleep 2
 done
-echo "Database connection successful!"
-# -- End of Connection Check --
+echo "Database is ready."
 
-# Запуск миграций с повторными попытками
-echo "Running migrations with retries..."
-php artisan migrate --force || (sleep 5 && php artisan migrate --force) || (sleep 10 && php artisan migrate --force)
+# Run database migrations with retry
+echo "Running database migrations..."
+MAX_MIGRATE_ATTEMPTS=5
+MIGRATE_ATTEMPTS=0
+while ! php artisan migrate --force; do
+    MIGRATE_ATTEMPTS=$((MIGRATE_ATTEMPTS+1))
+    if [ $MIGRATE_ATTEMPTS -ge $MAX_MIGRATE_ATTEMPTS ]; then
+        echo "Migration failed after $MAX_MIGRATE_ATTEMPTS attempts."
+        exit 1
+    fi
+    echo "Migration failed, retrying... (attempt $MIGRATE_ATTEMPTS of $MAX_MIGRATE_ATTEMPTS)"
+    sleep 5
+done
+echo "Migrations completed successfully."
 
-# Очистка кэша Spatie
-echo "Clearing Spatie permissions cache..."
+# Clear permission cache before seeding
+echo "Clearing permission cache..."
 php artisan permission:cache-reset
 
-# Запуск сидов с повторными попытками
-echo "Running seeders with retries..."
-php artisan db:seed --force || (sleep 5 && php artisan db:seed --force) || (sleep 10 && php artisan db:seed --force)
+# Run database seeding with retry
+echo "Running database seeding..."
+MAX_SEED_ATTEMPTS=5
+SEED_ATTEMPTS=0
+while ! php artisan db:seed --force; do
+    SEED_ATTEMPTS=$((SEED_ATTEMPTS+1))
+    if [ $SEED_ATTEMPTS -ge $MAX_SEED_ATTEMPTS ]; then
+        echo "Seeding failed after $MAX_SEED_ATTEMPTS attempts."
+        # Don't exit, just log it. The app might still be able to run.
+        echo "Seeding failed after multiple attempts."
+        break
+    fi
+    echo "Seeding failed, retrying... (attempt $SEED_ATTEMPTS of $MAX_SEED_ATTEMPTS)"
+    sleep 5
+done
+echo "Seeding process finished."
 
-# Очистка кэша после миграций
+
+# Clear and cache configuration and routes for performance
 php artisan config:cache
 php artisan route:cache
 
-# Запуск сервера
+# Start the Laravel server
 echo "Starting Laravel application on port $PORT..."
-php -S 0.0.0.0:$PORT -t public/ 
+php artisan serve --host 0.0.0.0 --port $PORT 
