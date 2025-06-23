@@ -17,12 +17,22 @@ php artisan config:clear
 php artisan cache:clear
 php artisan view:clear
 
-# Проверка подключения к базе данных
-echo "Checking database connection..."
-php artisan tinker --execute="DB::connection()->getPdo(); echo 'Database connection OK';" || {
-    echo "Database connection failed!"
-    exit 1
-}
+# -- Robust Database Connection Check with Retry --
+echo "Waiting for database to be ready..."
+max_attempts=15
+attempt_num=1
+# Hide output of tinker, we just need the exit code
+while ! php artisan tinker --execute="DB::connection()->getPdo()" >/dev/null 2>&1; do
+    if [ ${attempt_num} -eq ${max_attempts} ]; then
+        echo "Database connection failed after ${max_attempts} attempts. Exiting."
+        exit 1
+    fi
+    echo "Attempt ${attempt_num} of ${max_attempts}: Database not ready. Waiting 2 seconds..."
+    attempt_num=$((attempt_num+1))
+    sleep 2
+done
+echo "Database connection successful!"
+# -- End of Connection Check --
 
 # Запуск миграций
 echo "Running migrations..."
