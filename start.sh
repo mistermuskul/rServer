@@ -2,6 +2,11 @@
 # Exit immediately if a command exits with a non-zero status.
 set -e
 
+# --- 0. Debug Environment Variables ---
+echo "--- DEBUGGING DEPLOYMENT VARIABLES ---"
+echo "DATABASE_URL: $DATABASE_URL"
+echo "--------------------------------------"
+
 # --- 1. Wait for Database ---
 echo "Waiting for database connection..."
 max_attempts=30
