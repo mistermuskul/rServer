@@ -38,6 +38,10 @@ echo "Database connection successful!"
 echo "Running migrations with retries..."
 php artisan migrate --force || (sleep 5 && php artisan migrate --force) || (sleep 10 && php artisan migrate --force)
 
+# Очистка кэша Spatie
+echo "Clearing Spatie permissions cache..."
+php artisan permission:cache-reset
+
 # Запуск сидов с повторными попытками
 echo "Running seeders with retries..."
 php artisan db:seed --force || (sleep 5 && php artisan db:seed --force) || (sleep 10 && php artisan db:seed --force)
