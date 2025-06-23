@@ -7,7 +7,11 @@ echo "--- DEBUGGING DEPLOYMENT VARIABLES ---"
 echo "DATABASE_URL: $DATABASE_URL"
 echo "--------------------------------------"
 
-# --- 1. Wait for Database ---
+# --- 1. Clear Config Cache ---
+echo "Clearing configuration cache..."
+php artisan config:clear
+
+# --- 2. Wait for Database ---
 echo "Waiting for database connection..."
 max_attempts=30
 attempt_num=1
@@ -27,7 +31,7 @@ echo "Database connection successful!"
 echo "Giving the database a moment to stabilize..."
 sleep 5
 
-# --- 2. Run Migrations & Seeders ---
+# --- 3. Run Migrations & Seeders ---
 echo "Running database migrations and seeding..."
 max_migrate_attempts=5
 migrate_attempt_num=1
@@ -42,12 +46,12 @@ while ! php artisan migrate --force --seed; do
 done
 echo "Migrations and seeding successful!"
 
-# --- 3. Cache Configuration ---
+# --- 4. Cache Configuration ---
 echo "Caching configuration..."
 php artisan config:cache
 php artisan route:cache
 php artisan view:cache
 
-# --- 4. Start Server ---
+# --- 5. Start Server ---
 echo "Starting Laravel application..."
 php artisan serve --host 0.0.0.0 --port 8080 
