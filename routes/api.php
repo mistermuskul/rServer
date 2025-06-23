@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
 use App\Http\Controllers\User\AuthController;
 use App\Http\Controllers\User\UserController;
@@ -11,11 +12,43 @@ use App\Http\Controllers\MessageController;
 use App\Http\Controllers\TelegramController;
 
 // Тестовый маршрут для проверки API
-Route::get('/test', function () {
+Route::get('test', function () {
+    try {
+        // Проверка подключения к БД
+        DB::connection()->getPdo();
+        
+        return response()->json([
+            'message' => 'API работает!',
+            'timestamp' => now(),
+            'status' => 'success',
+            'route' => 'api/test',
+            'database' => 'connected'
+        ]);
+    } catch (\Exception $e) {
+        return response()->json([
+            'message' => 'API работает, но есть проблема с БД',
+            'error' => $e->getMessage(),
+            'status' => 'warning'
+        ], 500);
+    }
+});
+
+// Тестовый маршрут без префикса
+Route::get('ping', function () {
     return response()->json([
-        'message' => 'API работает!',
+        'message' => 'Pong!',
         'timestamp' => now(),
-        'status' => 'success'
+        'status' => 'success',
+        'route' => 'api/ping'
+    ]);
+});
+
+// Простой тест auth
+Route::post('auth/login', function (Request $request) {
+    return response()->json([
+        'message' => 'Auth endpoint работает!',
+        'method' => $request->method(),
+        'timestamp' => now()
     ]);
 });
 
@@ -32,9 +65,11 @@ Route::get('/', function () {
         'message' => 'Laravel API работает!',
         'endpoints' => [
             'test' => '/api/test',
+            'ping' => '/api/ping',
             'auth' => '/api/auth/login',
             'hero' => '/api/hero'
-        ]
+        ],
+        'timestamp' => now()
     ]);
 });
 

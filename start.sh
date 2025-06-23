@@ -17,8 +17,24 @@ php artisan config:clear
 php artisan cache:clear
 php artisan view:clear
 
+# Проверка подключения к базе данных
+echo "Checking database connection..."
+php artisan tinker --execute="DB::connection()->getPdo(); echo 'Database connection OK';" || {
+    echo "Database connection failed!"
+    exit 1
+}
+
 # Запуск миграций
+echo "Running migrations..."
 php artisan migrate --force
+
+# Запуск сидов
+echo "Running seeders..."
+php artisan db:seed --force
+
+# Очистка кэша после миграций
+php artisan config:cache
+php artisan route:cache
 
 # Запуск сервера
 echo "Starting Laravel application on port $PORT..."
