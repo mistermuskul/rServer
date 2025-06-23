@@ -24,7 +24,18 @@ sleep 5
 
 # --- 2. Run Migrations & Seeders ---
 echo "Running database migrations and seeding..."
-php artisan migrate --force --seed
+max_migrate_attempts=5
+migrate_attempt_num=1
+while ! php artisan migrate --force --seed; do
+    if [ ${migrate_attempt_num} -eq ${max_migrate_attempts} ]; then
+        echo "Migrations failed after ${max_migrate_attempts} attempts. Exiting."
+        exit 1
+    fi
+    echo "Migration attempt ${migrate_attempt_num} failed. Retrying in 5 seconds..."
+    sleep 5
+    migrate_attempt_num=$((migrate_attempt_num+1))
+done
+echo "Migrations and seeding successful!"
 
 # --- 3. Cache Configuration ---
 echo "Caching configuration..."
