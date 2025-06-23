@@ -17,6 +17,10 @@ php artisan key:generate --force
 # Создание символической ссылки для storage
 php artisan storage:link
 
+# Проверка подключения к базе данных
+echo "Проверка подключения к базе данных..."
+php artisan tinker --execute="try { DB::connection()->getPdo(); echo 'База данных подключена успешно'; } catch (Exception \$e) { echo 'Ошибка подключения к БД: ' . \$e->getMessage(); exit(1); }"
+
 # Запуск миграций и сидеров
 php artisan migrate --force --seed
 

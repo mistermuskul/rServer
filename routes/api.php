@@ -22,13 +22,19 @@ Route::get('test', function () {
             'timestamp' => now(),
             'status' => 'success',
             'route' => 'api/test',
-            'database' => 'connected'
+            'database' => 'connected',
+            'connection' => config('database.default'),
+            'host' => config('database.connections.mysql.host'),
+            'database_name' => config('database.connections.mysql.database')
         ]);
     } catch (\Exception $e) {
         return response()->json([
             'message' => 'API работает, но есть проблема с БД',
             'error' => $e->getMessage(),
-            'status' => 'warning'
+            'status' => 'warning',
+            'connection' => config('database.default'),
+            'host' => config('database.connections.mysql.host'),
+            'database_name' => config('database.connections.mysql.database')
         ], 500);
     }
 });
@@ -69,7 +75,10 @@ Route::get('/', function () {
             'auth' => '/api/auth/login',
             'hero' => '/api/hero'
         ],
-        'timestamp' => now()
+        'timestamp' => now(),
+        'database_connection' => config('database.default'),
+        'database_host' => config('database.connections.mysql.host'),
+        'database_name' => config('database.connections.mysql.database')
     ]);
 });
 
@@ -104,4 +113,27 @@ Route::middleware('auth:sanctum')->group(function () {
 
 Route::post('/telegram/webhook', [TelegramController::class, 'webhook']);
 Route::post('/telegram/send', [TelegramController::class, 'sendToTelegram']);
+
+// Тестовый маршрут для проверки переменных окружения БД
+Route::get('db-config', function () {
+    return response()->json([
+        'db_connection' => env('DB_CONNECTION'),
+        'db_host' => env('DB_HOST'),
+        'db_port' => env('DB_PORT'),
+        'db_database' => env('DB_DATABASE'),
+        'db_username' => env('DB_USERNAME'),
+        'db_password' => env('DB_PASSWORD') ? '***hidden***' : 'not_set',
+        'db_url' => env('DB_URL') ? '***hidden***' : 'not_set',
+        'mysql_host' => env('MYSQLHOST'),
+        'mysql_port' => env('MYSQLPORT'),
+        'mysql_database' => env('MYSQLDATABASE'),
+        'mysql_user' => env('MYSQLUSER'),
+        'mysql_password' => env('MYSQLPASSWORD') ? '***hidden***' : 'not_set',
+        'mysql_url' => env('MYSQL_URL') ? '***hidden***' : 'not_set',
+        'config_default' => config('database.default'),
+        'config_host' => config('database.connections.mysql.host'),
+        'config_database' => config('database.connections.mysql.database'),
+        'config_username' => config('database.connections.mysql.username'),
+    ]);
+});
 
