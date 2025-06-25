@@ -22,7 +22,6 @@ Route::get('test', function () {
             'timestamp' => now(),
             'status' => 'success',
             'route' => 'api/test',
-            'database' => 'connected'
         ]);
     } catch (\Exception $e) {
         return response()->json([
