@@ -8,16 +8,6 @@ sleep 10
 chmod -R 775 storage
 chmod -R 775 bootstrap/cache
 
-# Создание SQLite базы данных если её нет
-if [ ! -f database/database.sqlite ]; then
-    touch database/database.sqlite
-    chmod 664 database/database.sqlite
-fi
-
-# Установка переменных окружения для SQLite
-export DB_CONNECTION=sqlite
-export DB_DATABASE=/app/database/database.sqlite
-
 # Очистка кэша
 php artisan config:clear
 php artisan cache:clear
