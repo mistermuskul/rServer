@@ -11,6 +11,27 @@ use App\Http\Controllers\ProjectController;
 use App\Http\Controllers\MessageController;
 use App\Http\Controllers\TelegramController;
 
+// Health check endpoint for Railway
+Route::get('health', function () {
+    try {
+        // Проверка подключения к БД
+        DB::connection()->getPdo();
+        
+        return response()->json([
+            'status' => 'healthy',
+            'database' => 'connected',
+            'timestamp' => now()->toISOString()
+        ], 200);
+    } catch (\Exception $e) {
+        return response()->json([
+            'status' => 'unhealthy',
+            'database' => 'disconnected',
+            'error' => $e->getMessage(),
+            'timestamp' => now()->toISOString()
+        ], 503);
+    }
+});
+
 // Тестовый маршрут для проверки API
 Route::get('test', function () {
     try {

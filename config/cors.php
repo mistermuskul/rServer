@@ -28,7 +28,8 @@ return [
         'https://*.vercel.app',
         'https://*.netlify.app',
         'https://*.railway.app',
-        'https://mistermuskul.github.io'
+        'https://mistermuskul.github.io',
+        env('FRONTEND_URL', 'https://mistermuskul.github.io')
     ],
 
     'allowed_origins_patterns' => [],
