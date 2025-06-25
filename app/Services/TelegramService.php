@@ -17,9 +17,8 @@ class TelegramService
         $this->apiUrl = "https://api.telegram.org/bot{$this->token}";
         $this->defaultChatId = config('services.telegram.default_chat_id');
         
-        // Логируем инициализацию сервиса
         Log::info('TelegramService initialized', [
-            'token' => $this->token ? substr($this->token, 0, 5) . '...' : null, // Логируем только начало токена для безопасности
+            'token' => $this->token ? substr($this->token, 0, 5) . '...' : null,
             'apiUrl' => $this->apiUrl,
             'defaultChatId' => $this->defaultChatId
         ]);

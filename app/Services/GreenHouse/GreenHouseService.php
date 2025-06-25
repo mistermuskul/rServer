@@ -5,7 +5,6 @@ namespace App\Services\GreenHouse;
 use App\Models\GreenHouse;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Http\UploadedFile;
-use Illuminate\Support\Facades\Log;
 
 class GreenHouseService
 {
@@ -32,7 +31,6 @@ class GreenHouseService
     public function update(GreenHouse $greenhouse, array $data, ?UploadedFile $image = null)
     {
         if ($image) {
-            // Удаляем старое изображение, если оно есть
             if ($greenhouse->image_url) {
                 $oldPath = str_replace('/storage/', '', $greenhouse->image_url);
                 Storage::disk('public')->delete($oldPath);

@@ -11,10 +11,8 @@ use App\Http\Controllers\ProjectController;
 use App\Http\Controllers\MessageController;
 use App\Http\Controllers\TelegramController;
 
-// Тестовый маршрут для проверки API
 Route::get('test', function () {
     try {
-        // Проверка подключения к БД
         DB::connection()->getPdo();
         
         return response()->json([
@@ -32,7 +30,6 @@ Route::get('test', function () {
     }
 });
 
-// Тестовый маршрут без префикса
 Route::get('ping', function () {
     return response()->json([
         'message' => 'Pong!',
@@ -42,7 +39,6 @@ Route::get('ping', function () {
     ]);
 });
 
-// Простой тест auth
 Route::post('auth/login', function (Request $request) {
     return response()->json([
         'message' => 'Auth endpoint работает!',
@@ -78,14 +74,12 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::put('/hero/{id?}', [HeroProfileController::class, 'update']);
     Route::apiResource('projects', ProjectController::class);
     
-    // Message routes
     Route::get('/messages/users', [MessageController::class, 'getUsers']);
     Route::get('/messages', [MessageController::class, 'index']);
     Route::post('/messages', [MessageController::class, 'store']);
     Route::get('/messages/unread-count', [MessageController::class, 'unreadCount']);
     Route::get('/messages/unread-by-user', [MessageController::class, 'unreadCountByUser']);
 
-    // HR generation route
     Route::post('/user/generate-hr', [UserController::class, 'generateHR']);
 
     Route::get('/user', function (Request $request) {

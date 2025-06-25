@@ -54,7 +54,6 @@ class AuthController extends Controller
                 ], 404);
             }
 
-            // Проверяем, что пользователь имеет роль HR
             if (!$user->hasRole('HR')) {
                 Log::error('User does not have HR role. UUID: ' . $uuid);
                 return response()->json([
@@ -62,10 +61,8 @@ class AuthController extends Controller
                 ], 403);
             }
 
-            // Удаляем все существующие токены пользователя
             $user->tokens()->delete();
 
-            // Создаем новый токен
             $token = $user->createToken('auth-token')->plainTextToken;
 
             Log::info('Auto login successful for user: ' . $user->email);

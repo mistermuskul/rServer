@@ -6,7 +6,6 @@ use App\Models\GreenHouse;
 use App\Services\GreenHouse\GreenHouseService;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Support\Facades\Log;
 
 class GreenHouseController extends Controller
 {
@@ -19,16 +18,8 @@ class GreenHouseController extends Controller
 
     public function index(): JsonResponse
     {
-        Log::info('GreenHouseController: index вызван');
         $greenhouses = $this->greenHouseService->getAll();
 
-        // Логируем все image_url
-        foreach ($greenhouses as $greenhouse) {
-            Log::info('GreenHouseController: Отдаю изображение', [
-                'id' => $greenhouse->id,
-                'image_url' => $greenhouse->image_url,
-            ]);
-        }
 
         return response()->json($greenhouses);
     }

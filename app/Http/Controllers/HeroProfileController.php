@@ -76,7 +76,6 @@ class HeroProfileController extends Controller
             $hero = HeroProfile::findOrFail($id);
 
             if ($request->has('avatar') && str_starts_with($request->avatar, 'data:image')) {
-                // Удаляем старое изображение
                 if ($hero->avatar) {
                     Storage::disk('public')->delete($hero->avatar);
                 }

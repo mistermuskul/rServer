@@ -13,7 +13,6 @@ class ProjectController extends Controller
     {
         $projects = Project::orderBy('order')->get();
         
-        // Добавляем полный URL к изображениям
         $projects->transform(function ($project) {
             if ($project->image) {
                 $project->image = url('storage/' . $project->image);
@@ -68,7 +67,6 @@ class ProjectController extends Controller
             ]);
 
             if ($request->has('image') && str_starts_with($request->image, 'data:image')) {
-                // Удаляем старое изображение
                 if ($project->image) {
                     Storage::disk('public')->delete($project->image);
                 }
@@ -102,7 +100,7 @@ class ProjectController extends Controller
                 Storage::disk('public')->delete($project->image);
             }
             $project->delete();
-            return response()->json(['message' => 'Проект успешно удален']);
+            return response()->json(['message' => 'Project successfully deleted']);
         } catch (\Throwable $e) {
             Log::error('Ошибка удаления проекта: ' . $e->getMessage());
             return response()->json([

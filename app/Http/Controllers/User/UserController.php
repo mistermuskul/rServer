@@ -88,19 +88,12 @@ class UserController extends Controller
     public function generateHR()
     {
         try {
-            // Генерируем UUID
             $uuid = Str::uuid()->toString();
             
-            Log::info('Starting HR account generation with UUID: ' . $uuid);
-            
-            // Находим все HR аккаунты
             $hrAccounts = User::where('email', 'like', 'hr%@hr.ru')
                 ->orderBy('email', 'asc')
                 ->get();
                 
-            Log::info('Found existing HR accounts: ' . $hrAccounts->pluck('email')->implode(', '));
-            
-            // Находим следующий свободный номер
             $hrNumber = 1;
             $email = "hr{$hrNumber}@hr.ru";
             $attempts = 0;
@@ -110,25 +103,18 @@ class UserController extends Controller
                 $email = "hr{$hrNumber}@hr.ru";
                 $attempts++;
                 
-                // Защита от бесконечного цикла
                 if ($attempts > 100) {
                     throw new \Exception('Не удалось найти свободный email для HR аккаунта после 100 попыток');
                 }
             }
             
-            Log::info('Selected email for new HR account: ' . $email);
-            
-            // Создаем нового пользователя
             $user = User::create([
                 'name' => $uuid,
                 'email' => $email,
                 'password' => Hash::make($uuid),
             ]);
-
-            // Назначаем роль HR
             $user->assignRole(RoleEnum::HR->value);
 
-            Log::info('HR account created successfully: ' . $user->email);
 
             return response()->json([
                 'success' => true,
