@@ -35,7 +35,7 @@ class UserSeeder extends Seeder
         );
         
         $hr = User::firstOrCreate(
-            ['email' => 'hr@hr.ru'],
+            ['email' => 'hr1@hr.ru'],
             [
                 'name' => 'HR',
                 'password' => bcrypt('password'),
